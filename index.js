@@ -1,4 +1,3 @@
-
 import express from "express";
 import dotenv from "dotenv";
 import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
@@ -19,11 +18,11 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
-
 const run = async () => {
   try {
     const db = client.db("pc_builder_lab");
     const productCollection = db.collection("products");
+    const providerCollection = db.collection("providers");
 
     app.get("/products", async (req, res) => {
       const cursor = productCollection.find({});
@@ -32,8 +31,8 @@ const run = async () => {
       res.send({ status: true, data: products });
     });
 
-    // get single product 
-    app.get('/products/:id', async (req, res) => {
+    // get single product
+    app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
 
       const result = await productCollection.findOne({ _id: ObjectId(id) });
@@ -41,18 +40,33 @@ const run = async () => {
       res.send(result);
     });
 
-
-
-
-    // Get Category wise product 
-    app.get('/product/:catUrl', async (req, res) => {
-
+    // Get Category wise product
+    app.get("/product/:catUrl", async (req, res) => {
       const categoryPath = req.params.catUrl;
 
       const result = productCollection.find({ categoryUrl: categoryPath });
-      const getCategoryWiseProducts = await result.toArray()
+      const getCategoryWiseProducts = await result.toArray();
       res.send(getCategoryWiseProducts);
     });
+
+    // All Providers
+
+    app.get("/providers", async (req, res) => {
+      const cursor = providerCollection.find({});
+      const providers = await cursor.toArray();
+
+      res.send({ status: true, data: providers });
+    });
+
+    // get single provider
+    app.get("/providers/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const result = await providerCollection.findOne({ _id: ObjectId(id) });
+      console.log(result);
+      res.send(result);
+    });
+
 
   } finally {
   }
